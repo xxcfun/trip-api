@@ -104,6 +104,9 @@ class ImageListSerializer(BaseSerializer):
             images.append(BaseImageSerializer(image).to_dict())
 
         return images
+
+
+# TODO 景点下的所有图片
 # class ImageListSerializer(BaseListPageSerializer):
 #
 #     def get_object(self, obj):
@@ -113,3 +116,24 @@ class ImageListSerializer(BaseSerializer):
 #         images = dict(images)
 #         print(images)
 #         return images
+
+
+class TicketDetailSerializer(BaseSerializer):
+    """ 门票详情 """
+    def to_dict(self):
+        obj = self.obj
+        return {
+            'pk': obj.pk,
+            'name': obj.name,
+            'desc': obj.desc,
+            'types': obj.types,
+            'price': obj.price,
+            'sell_price': obj.price,
+            'discount': obj.discount,
+            'expire_date': obj.expire_date,
+            'return_policy': obj.return_policy,
+            'has_invoice': obj.has_invoice,
+            'entry_way': obj.get_entry_way_display(),
+            'tips': obj.tips,
+            'remark': obj.remark
+        }
