@@ -1,4 +1,4 @@
-from utils.serializers import BaseSerializer
+from utils.serializers import BaseSerializer, BaseListPageSerializer
 
 
 class OrderItemSerializer(BaseSerializer):
@@ -44,4 +44,21 @@ class OrderDetailSerializer(BaseSerializer):
             'types': obj.types,
             'created_at': obj.created_at,
             'items': items
+        }
+
+
+class OrderListSerializer(BaseListPageSerializer):
+    """ 订单列表 """
+    def get_object(self, obj):
+        item_first_obj = obj.order_items.first()
+        item_first = OrderItemSerializer(item_first_obj).to_dict()
+        return {
+            'sn': obj.sn,
+            'buy_amount': obj.buy_amount,
+            'buy_count': obj.buy_count,
+            'types': obj.types,
+            'status': obj.status,
+            'remark': obj.remark,
+            'created_at': obj.created_at,
+            'item_first': item_first
         }

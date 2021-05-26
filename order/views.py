@@ -2,17 +2,17 @@ import json
 
 from django import http
 from django.db import transaction
-from django.db.models import F
+from django.db.models import F, Q
 from django.shortcuts import render
 from django.utils.decorators import method_decorator
-from django.views.generic import FormView
+from django.views.generic import FormView, ListView
 from django.views.generic.detail import BaseDetailView
 
 from order import serializers
 from order.choices import OrderStatus
 from order.forms import SubmitTicketOrderForm
 from order.models import Order
-from utils.response import BadRequestJsonResponse
+from utils.response import BadRequestJsonResponse, NotFoundJsonResponse
 from utils.views import login_required
 
 
@@ -109,3 +109,32 @@ class OrderDetail(BaseDetailView):
             items.update(status=OrderStatus.CANCELED)
             return http.HttpResponse('', status=201)
         return http.HttpResponse('', 200)
+
+
+@method_decorator(login_required, name='dispatch')
+class OrderListView(ListView):
+    """ 订单列表 """
+    paginate_by = 10
+
+    def get_queryset(self):
+        user = self.request.user
+        query = Q(is_valid=True, user=user)
+        # 按状态查询
+        status = self.request.GET.get('status', None)
+        # 如果status等于0，那么
+        if status and status != '0':
+            # 拼接查询条件
+            query = query & Q(status=status)
+        return Order.objects.filter(query)
+
+    def render_to_response(self, context, **response_kwargs):
+        page_obj = context['page_obj']
+        if page_obj is not None:
+            data = serializers.OrderListSerializer(page_obj).to_dict()
+            return http.JsonResponse(data)
+        return NotFoundJsonResponse()
+
+    def get_paginate_by(self, queryset):
+        """ 从前端控制每一页的分页大小 """
+        page_size = self.request.GET.get('limit', None)
+        return page_size or self.paginate_by
