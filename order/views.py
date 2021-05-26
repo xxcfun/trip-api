@@ -4,8 +4,11 @@ from django import http
 from django.shortcuts import render
 from django.utils.decorators import method_decorator
 from django.views.generic import FormView
+from django.views.generic.detail import BaseDetailView
 
+from order import serializers
 from order.forms import SubmitTicketOrderForm
+from order.models import Order
 from utils.response import BadRequestJsonResponse
 from utils.views import login_required
 
@@ -37,3 +40,18 @@ class TicketOrderSubmitView(FormView):
         return http.JsonResponse({
             'sn': obj.sn
         }, status=201)
+
+
+@method_decorator(login_required, name='dispatch')
+class OrderDetail(BaseDetailView):
+    slug_field = 'sn'
+    slug_url_kwarg = 'sn'
+
+    def get_queryset(self):
+        user = self.request.user
+        return Order.objects.filter(user=user, is_valid=True)
+
+    def get(self, request, *args, **kwargs):
+        order_obj = self.get_object()
+        data = serializers.OrderDetailSerializer(order_obj).to_dict()
+        return http.JsonResponse(data)
