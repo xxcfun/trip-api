@@ -76,7 +76,19 @@ class OrderDetail(BaseDetailView):
 
     def delete(self, request, *args, **kwargs):
         """ DELETE：订单删除 """
-        pass
+        # 获取订单对象
+        order_obj = self.get_object()
+        # 数据验证（已经支付，已经取消）
+        if order_obj.status == OrderStatus.CANCELED or order_obj.status == OrderStatus.PAID:
+            # 是否已经删除过了
+            if order_obj.is_valid:
+                order_obj.is_valid = False
+                order_obj.save()
+                return http.HttpResponse('', status=201)
+            else:
+                # 由于上面已过滤False字段，所以此处不做配置，由get_queryset触发404
+                pass
+        return http.HttpResponse('', status=200)
 
     @transaction.atomic()
     def put(self, request, *args, **kwargs):
