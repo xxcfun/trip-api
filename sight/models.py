@@ -1,3 +1,4 @@
+from ckeditor.fields import RichTextField
 from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models
 
@@ -13,7 +14,8 @@ class Sight(CommonModel):
     desc = models.CharField('描述', max_length=256)
     main_img = models.ImageField('主图', upload_to='%Y%m/sight/', max_length=256)
     banner_img = models.ImageField('详情主图', upload_to='%Y%m/sight/', max_length=256)
-    content = models.TextField('详细')
+    # content = models.TextField('详细')
+    content = RichTextField('详细')
     score = models.FloatField('评分', default=5)
     min_price = models.FloatField('最低价格', default=0)
     province = models.CharField('省份', max_length=32)
@@ -49,10 +51,10 @@ class Sight(CommonModel):
 class Info(models.Model):
     """ 景点详情 """
     sight = models.OneToOneField(Sight, on_delete=models.CASCADE, verbose_name='关联景点')
-    entry_explain = models.CharField('入园参考', max_length=1024, null=True, blank=True)
-    play_way = models.TextField('特色玩法', null=True, blank=True)
-    tips = models.TextField('温馨提示', null=True, blank=True)
-    traffic = models.TextField('交通到达', null=True, blank=True)
+    entry_explain = RichTextField('入园参考', max_length=1024, null=True, blank=True)
+    play_way = RichTextField('特色玩法', null=True, blank=True)
+    tips = RichTextField('温馨提示', null=True, blank=True)
+    traffic = RichTextField('交通到达', null=True, blank=True)
 
     class Meta:
         db_table = 'sight_info'
@@ -77,8 +79,8 @@ class Ticket(CommonModel):
     return_policy = models.CharField('退改政策', max_length=64, default='条件退')
     has_invoice = models.BooleanField('是否提供发票', default=True)
     entry_way = models.SmallIntegerField('入院方式', choices=EntryWay.choices, default=EntryWay.BY_TICKET)
-    tips = models.TextField('预定须知', null=True, blank=True)
-    remark = models.TextField('其它说明', null=True, blank=True)
+    tips = RichTextField('预定须知', null=True, blank=True)
+    remark = RichTextField('其它说明', null=True, blank=True)
     status = models.SmallIntegerField('状态', choices=TicketStatus.choices, default=TicketStatus.OPEN)
 
     class Meta:
@@ -98,7 +100,7 @@ class Comment(CommonModel):
     """ 评论及回复 """
     user = models.ForeignKey(User, verbose_name='评论人', related_name='comments', on_delete=models.CASCADE)
     sight = models.ForeignKey(Sight, verbose_name='景点', related_name='comments', on_delete=models.CASCADE)
-    content = models.TextField('评论内容', blank=True, null=True)
+    content = RichTextField('评论内容', blank=True, null=True)
     is_top = models.BooleanField('是否置顶', default=False)
     love_count = models.IntegerField('点赞次数', default=0)
     score = models.FloatField('评分', default=5)

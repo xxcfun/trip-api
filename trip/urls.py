@@ -25,5 +25,7 @@ urlpatterns = [
     # 用户模块
     path('accounts/', include('accounts.urls')),
     # 订单模块
-    path('order/', include('order.urls'))
+    path('order/', include('order.urls')),
+    # 富文本相关配置
+    path('ckeditor/', include('ckeditor_uploader.urls'))
 ]

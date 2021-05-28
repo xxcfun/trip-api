@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/3.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
-
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -37,6 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    # 富文本编辑器
+    'ckeditor',
     # 系统模块
     'system.apps.SystemConfig',
     # 景点模块
@@ -131,7 +133,13 @@ USE_TZ = False
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
+# 富文本编辑器文件上传的位置
+CKEDITOR_UPLOAD_PATH = 'uploads/'
+
 MEDIA_URL = 'http://localhost:8080/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'medias')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
