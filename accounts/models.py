@@ -11,6 +11,8 @@ class User(AbstractUser):
 
     class Meta:
         db_table = 'account_user'
+        verbose_name_plural = '用户'
+        verbose_name = '用户'
 
     @property
     def avatar_url(self):

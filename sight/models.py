@@ -29,6 +29,8 @@ class Sight(CommonModel):
     class Meta:
         db_table = 'sight'
         ordering = ['-updated_at']
+        verbose_name = '景点基础信息'
+        verbose_name_plural = '景点基础信息'
 
     @property
     def comment_count(self):
@@ -40,10 +42,13 @@ class Sight(CommonModel):
         """ 图片数量 """
         return self.images.filter(is_valid=True).count()
 
+    def __str__(self):
+        return self.name
+
 
 class Info(models.Model):
     """ 景点详情 """
-    sight = models.OneToOneField(Sight, on_delete=models.CASCADE)
+    sight = models.OneToOneField(Sight, on_delete=models.CASCADE, verbose_name='关联景点')
     entry_explain = models.CharField('入园参考', max_length=1024, null=True, blank=True)
     play_way = models.TextField('特色玩法', null=True, blank=True)
     tips = models.TextField('温馨提示', null=True, blank=True)
@@ -51,6 +56,11 @@ class Info(models.Model):
 
     class Meta:
         db_table = 'sight_info'
+        verbose_name = '景点详情'
+        verbose_name_plural = '景点详情'
+
+    def __str__(self):
+        return self.sight.name
 
 
 class Ticket(CommonModel):
@@ -73,11 +83,15 @@ class Ticket(CommonModel):
 
     class Meta:
         db_table = 'sight_ticket'
+        verbose_name = verbose_name_plural = '门票'
 
     @property
     def sell_price(self):
         """ 销售价 = 原价 ✖ 折扣 """
         return self.price * self.discount / 10
+
+    def __str__(self):
+        return self.sight.name + '_' + self.name
 
 
 class Comment(CommonModel):
@@ -99,3 +113,7 @@ class Comment(CommonModel):
     class Meta:
         db_table = 'sight_comment'
         ordering = ['-love_count', '-created_at']
+        verbose_name = verbose_name_plural = '评论及回复'
+
+    def __str__(self):
+        return self.sight.name + '景点的评论'
