@@ -44,6 +44,11 @@ class Profile(models.Model):
 
     class Meta:
         db_table = 'accounts_user_profile'
+        verbose_name = '用户详细信息'
+        verbose_name_plural = '用户详细信息'
+
+    def __str__(self):
+        return self.username
 
 
 class LoginRecord(models.Model):
