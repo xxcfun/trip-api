@@ -5,6 +5,8 @@ from sight import views
 urlpatterns = [
     # 景点列表接口
     path('sight/list/', views.SightListView.as_view(), name='sight_list'),
+    # 缓存景点列表接口
+    path('sight/list/cache/', views.SightListCacheView.as_view(), name='sight_list_cache'),
     # 景点详情信息
     path('sight/detail/<int:pk>/', views.SightDetailView.as_view(), name='sight_detail'),
     # 景点下的评论列表

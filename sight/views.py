@@ -1,15 +1,19 @@
+import json
+
 from django import http
+from django.core.cache import cache
 from django.db.models import Q
 from django.views.generic import ListView, DetailView
 
 from sight import serializers
 from sight.models import Sight, Comment, Ticket, Info
+from utils import constants
 from utils.response import NotFoundJsonResponse
 
 
 class SightListView(ListView):
     """ 景点列表 """
-    # 每页放5条数据
+    # 每页放10条数据
     paginate_by = 10
 
     def get_queryset(self):
@@ -39,6 +43,62 @@ class SightListView(ListView):
         page_obj = context['page_obj']
         if page_obj is not None:
             data = serializers.SightListSerializer(page_obj).to_dict()
+            return http.JsonResponse(data)
+        else:
+            return NotFoundJsonResponse()
+
+
+class SightListCacheView(ListView):
+    """ 景点列表-缓存优化 """
+    # 每页放20条数据
+    paginate_by = 20
+
+    def get_queryset(self):
+        """ 重写查询方法 """
+        query = Q(is_valid=True)
+        # 1.热门景点
+        is_hot = self.request.GET.get('is_hot', None)
+        if is_hot:
+            query = query & Q(is_hot=True)
+        # 2.精选景点
+        is_top = self.request.GET.get('is_top', None)
+        if is_top:
+            query = query & Q(is_top=True)
+        queryset = Sight.objects.filter(query)
+        return queryset
+
+    def get_paginate_by(self, queryset):
+        """ 从前端控制每一页的分页大小 """
+        page_size = self.request.GET.get('limit', None)
+        return page_size or self.paginate_by
+
+    def render_to_response(self, context, **response_kwargs):
+        # 从缓存拿数据
+        # 1.热门景点
+        is_hot = self.request.GET.get('is_hot', None)
+        if is_hot:
+            try:
+                data = cache.get(constants.INDEX_SIGHT_HOT_KEY)
+                if data:
+                    print(data)
+                    return http.JsonResponse(json.loads(data))
+            except Exception as e:
+                print(e)
+        # 2.精选景点
+        is_top = self.request.GET.get('is_top', None)
+        if is_top:
+            try:
+                data = cache.get(constants.INDEX_SIGHT_TOP_KEY)
+                if data:
+                    print(data)
+                    return http.JsonResponse(json.loads(data))
+            except Exception as e:
+                print(e)
+        # 从数据库拿数据
+        page_obj = context['page_obj']
+        if page_obj is not None:
+            data = serializers.SightListSerializer(page_obj).to_dict()
+            print('数据库')
             return http.JsonResponse(data)
         else:
             return NotFoundJsonResponse()
