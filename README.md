@@ -4,7 +4,7 @@
 
 前端页面仓库如下：
 
-[https://github.com/hhdMrLion/trip-mobile](https://github.com/hhdMrLion/trip-mobile)
+[https://github.com/xxcfun/trip-mobile](https://github.com/xxcfun/trip-mobile)
 
 ## 更新日志
 
